@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from api.v1 import router as v1_router
 from dependencies.database import engine, Base
+import os
 
 # FastAPI app with Swagger metadata
 app = FastAPI(
