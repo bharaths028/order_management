@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from api.v1 import router as v1_router
 from dependencies.database import engine, Base
+from fastapi.middleware.cors import CORSMiddleware
 import os
 
 # FastAPI app with Swagger metadata
@@ -17,7 +18,7 @@ app = FastAPI(
     ],
     servers=[
         {"url": os.getenv("RENDER_EXTERNAL_URL", "https://order-management-api-knhi.onrender.com"), "description": "Production Server"},
-        {"url": "http://localhost:8000", "description": "Production server"}
+        {"url": "http://localhost:8000", "description": "Local server"}
     ]
 )
 
@@ -26,6 +27,14 @@ Base.metadata.create_all(bind=engine)
 
 # Include API v1 router
 app.include_router(v1_router, prefix="/v1")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins for testing; restrict in production (e.g., ["https://yourdomain.com"])
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get(
     "/health",
