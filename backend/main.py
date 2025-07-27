@@ -15,6 +15,7 @@ app = FastAPI(
         {"name": "health", "description": "System health check operations"}
     ],
     servers=[
+        {"url": os.getenv("RENDER_EXTERNAL_URL", "https://order-management-api-knhi.onrender.com"), "description": "Production Server"},
         {"url": "http://localhost:8000", "description": "Production server"}
     ]
 )
