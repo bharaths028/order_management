@@ -4,8 +4,9 @@ from models.enquiry import Enquiry
 from models.enquiry_product import EnquiryProduct
 from schemas.enquiry import EnquiryCreate, EmailRequest, EnquiryUpdate
 from utils.enquiry_id import generate_enquiry_id
+import uuid
 
-def get_enquiry(db: Session, enquiry_id: str):
+def get_enquiry(db: Session, enquiry_id: uuid.UUID):
     return db.query(Enquiry).options(joinedload(Enquiry.products)).filter(Enquiry.enquiry_id == enquiry_id).first()
 
 def get_enquiries(db: Session, status: str = None, skip: int = 0, limit: int = 10):
@@ -41,7 +42,7 @@ def create_enquiry(db: Session, enquiry: EnquiryCreate, enquiry_datetime: dateti
     db.refresh(db_enquiry)
     return db_enquiry  # Return the SQLAlchemy object
 
-def create_enquiry_from_email(db: Session, email: EmailRequest, enquiry_id: str):
+def create_enquiry_from_email(db: Session, email: EmailRequest, enquiry_id: uuid.UUID):
     enquiry_datetime = datetime.utcnow()
     db_enquiry = Enquiry(
         enquiry_id=enquiry_id,
@@ -67,7 +68,7 @@ def create_enquiry_from_email(db: Session, email: EmailRequest, enquiry_id: str)
     db.refresh(db_enquiry)
     return db_enquiry
 
-def update_enquiry(db: Session, enquiry_id: str, enquiry_update: EnquiryUpdate):
+def update_enquiry(db: Session, enquiry_id: uuid.UUID, enquiry_update: EnquiryUpdate):
     db_enquiry = db.query(Enquiry).filter(Enquiry.enquiry_id == enquiry_id).first()
     if not db_enquiry:
         return None

@@ -1,9 +1,10 @@
 from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
+import uuid
 
 class ChangeLog(BaseModel):
-    log_id: int = Field(..., description="Unique log ID", example=1)
+    log_id: uuid.UUID = Field(..., description="Unique log ID", example="550e8400-e29b-41d4-a716-446655440000")
     table_name: str = Field(..., description="Table name", example="enquiries")
     record_id: str = Field(..., description="Record ID", example="isp02/25/0020")
     action: str = Field(..., description="Action performed (view/edit/create/delete/flag/system)", example="create")
@@ -15,7 +16,7 @@ class ChangeLog(BaseModel):
         from_attributes = True
         json_schema_extra = {
             "example": {
-                "log_id": 1,
+                "log_id": "550e8400-e29b-41d4-a716-446655440000",
                 "table_name": "enquiries",
                 "record_id": "isp02/25/0020",
                 "action": "create",

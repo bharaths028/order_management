@@ -1,11 +1,12 @@
 from sqlalchemy.orm import Session
 from models.enquiry_hash import EnquiryHash
 from datetime import datetime
+import uuid
 
 def get_enquiry_hash(db: Session, hash_value: str):
     return db.query(EnquiryHash).filter(EnquiryHash.hash == hash_value).first()
 
-def store_enquiry_hash(db: Session, hash_value: str, enquiry_id: str):
+def store_enquiry_hash(db: Session, hash_value: str, enquiry_id: uuid.UUID):
     db_hash = EnquiryHash(
         hash=hash_value,
         enquiry_id=enquiry_id,

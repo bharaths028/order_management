@@ -15,6 +15,7 @@ from models.enquiry import Enquiry as EnquiryModel
 from models.customer import Customer as CustomerModel
 from utils.hash import compute_enquiry_hash
 from utils.enquiry_id import generate_enquiry_id
+import uuid
 
 router = APIRouter()
 
@@ -70,7 +71,7 @@ def list_enquiries(status: Optional[str] = None, page: int = 1, limit: int = 10,
         429: {"description": "Rate limit exceeded", "model": Error}
     }
 )
-def read_enquiry(enquiry_id: str, db: Session = Depends(get_db)):
+def read_enquiry(enquiry_id: uuid.UUID, db: Session = Depends(get_db)):
     enquiry = get_enquiry(db, enquiry_id)
     if enquiry is None:
         raise HTTPException(status_code=404, detail={"code": "err_not_found", "message": "Enquiry not found"})
@@ -89,7 +90,7 @@ def read_enquiry(enquiry_id: str, db: Session = Depends(get_db)):
         429: {"description": "Rate limit exceeded", "model": Error}
     }
 )
-def update_enquiry_details(enquiry_id: str, enquiry_update: EnquiryUpdate, db: Session = Depends(get_db)):
+def update_enquiry_details(enquiry_id: uuid.UUID, enquiry_update: EnquiryUpdate, db: Session = Depends(get_db)):
     enquiry = update_enquiry(db, enquiry_id, enquiry_update)
     if enquiry is None:
         raise HTTPException(status_code=404, detail={"code": "err_not_found", "message": "Enquiry not found"})
@@ -150,7 +151,7 @@ def process_bulk_enquiries(request: BulkEnquiryRequest, db: Session = Depends(ge
         429: {"description": "Rate limit exceeded", "model": Error}
     }
 )
-def read_parsing_status(enquiry_id: str, db: Session = Depends(get_db)):
+def read_parsing_status(enquiry_id: uuid.UUID, db: Session = Depends(get_db)):
     status = get_parsing_status(db, enquiry_id)
     if status is None:
         raise HTTPException(status_code=404, detail={"code": "err_not_found", "message": "Parsing status not found"})
@@ -168,7 +169,7 @@ def read_parsing_status(enquiry_id: str, db: Session = Depends(get_db)):
         429: {"description": "Rate limit exceeded", "model": Error}
     }
 )
-def read_enquiry_dashboard(enquiry_id: str, db: Session = Depends(get_db)):
+def read_enquiry_dashboard(enquiry_id: uuid.UUID, db: Session = Depends(get_db)):
     enquiry = db.query(EnquiryModel).options(joinedload(EnquiryModel.products)).filter(EnquiryModel.enquiry_id == enquiry_id).first()
     if not enquiry:
         raise HTTPException(status_code=404, detail={"code": "err_not_found", "message": "Enquiry not found"})

@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Optional
+import uuid
 
 class ProductBase(BaseModel):
     product_name: str = Field(..., description="Name of the product", example="Acetone")
@@ -22,12 +23,10 @@ class ProductBase(BaseModel):
     country_of_origin: Optional[str] = Field("india", description="Country of origin", example="india")
 
 class ProductCreate(ProductBase):
-    product_id: str = Field(..., description="Unique product identifier", example="isp-a123")
 
     class Config:
         json_schema_extra = {
             "example": {
-                "product_id": "isp-a123",
                 "product_name": "Acetone",
                 "cat_number": "isp-a049010",
                 "cas_number": "67-64-1",
@@ -50,13 +49,13 @@ class ProductCreate(ProductBase):
         }
 
 class Product(ProductBase):
-    product_id: str = Field(..., description="Unique product identifier", example="isp-a123")
+    product_id: uuid.UUID = Field(..., description="Unique product identifier", example="550e8400-e29b-41d4-a716-446655440000")
 
     class Config:
         from_attributes = True
         json_schema_extra = {
             "example": {
-                "product_id": "isp-a123",
+                "product_id": "550e8400-e29b-41d4-a716-446655440000",
                 "product_name": "Acetone",
                 "cat_number": "isp-a049010",
                 "cas_number": "67-64-1",
@@ -79,32 +78,32 @@ class Product(ProductBase):
         }
 
 class ProductValidationRequest(BaseModel):
-    enquiry_id: str = Field(..., description="Enquiry ID", example="isp02/25/0020")
-    product_id: str = Field(..., description="Product ID", example="isp-a123")
+    enquiry_id: uuid.UUID = Field(..., description="Enquiry ID", example="550e8400-e29b-41d4-a716-446655440000")
+    product_id: uuid.UUID = Field(..., description="Product ID", example="550e8400-e29b-41d4-a716-446655440000")
     cas_number: Optional[str] = Field(None, description="CAS number", example="67-64-1")
     cat_number: Optional[str] = Field(None, description="Catalog number", example="isp-a049010")
 
     class Config:
         json_schema_extra = {
             "example": {
-                "enquiry_id": "isp02/25/0020",
-                "product_id": "isp-a123",
+                "enquiry_id": "550e8400-e29b-41d4-a716-446655440000",
+                "product_id": "550e8400-e29b-41d4-a716-446655440000",
                 "cas_number": "67-64-1",
                 "cat_number": "isp-a049010"
             }
         }
 
 class ProductValidationResponse(BaseModel):
-    enquiry_id: str = Field(..., description="Enquiry ID", example="isp02/25/0020")
-    product_id: str = Field(..., description="Product ID", example="isp-a123")
+    enquiry_id: uuid.UUID = Field(..., description="Enquiry ID", example="550e8400-e29b-41d4-a716-446655440000")
+    product_id: uuid.UUID = Field(..., description="Product ID", example="550e8400-e29b-41d4-a716-446655440000")
     flag: str = Field(..., description="Flag (y/n) indicating if product is valid", example="y")
     reason: Optional[str] = Field(None, description="Reason for validation result", example="Product found in Master Product Table")
 
     class Config:
         json_schema_extra = {
             "example": {
-                "enquiry_id": "isp02/25/0020",
-                "product_id": "isp-a123",
+                "enquiry_id": "550e8400-e29b-41d4-a716-446655440000",
+                "product_id": "550e8400-e29b-41d4-a716-446655440000",
                 "flag": "y",
                 "reason": "Product found in Master Product Table"
             }

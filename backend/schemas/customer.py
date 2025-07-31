@@ -1,9 +1,10 @@
 from pydantic import BaseModel, Field
 from typing import Optional
+import uuid
 
 class CustomerBase(BaseModel):
     name: str = Field(..., description="Customer's full name or organization name", example="Acme Corp")
-    email: str = Field(..., description="Customer's email address", example="contact@acme.com")
+    email: Optional[str] = Field(None, description="Customer's email address", example="contact@acme.com")
     phone: Optional[str] = Field(None, description="Customer's phone number", example="+1-555-123-4567")
     mobile: Optional[str] = Field(None, description="Customer's mobile number", example="+1-555-987-6543")
     landline: Optional[str] = Field(None, description="Customer's landline number", example="+1-555-111-2222")
@@ -16,12 +17,10 @@ class CustomerBase(BaseModel):
     contact_owner: Optional[str] = Field(None, description="Source of enquiry", example="ISP Email")
 
 class CustomerCreate(CustomerBase):
-    customer_id: str = Field(..., description="Unique customer identifier", example="cust-001")
 
     class Config:
         json_schema_extra = {
             "example": {
-                "customer_id": "cust-001",
                 "name": "Acme Corp",
                 "email": "contact@acme.com",
                 "phone": "+1-555-123-4567",
@@ -60,13 +59,13 @@ class CustomerUpdate(BaseModel):
         }
 
 class Customer(CustomerBase):
-    customer_id: str = Field(..., description="Unique customer identifier", example="cust-001")
+    customer_id: uuid.UUID = Field(..., description="Unique customer identifier", example="550e8400-e29b-41d4-a716-446655440000")
 
     class Config:
         from_attributes = True
         json_schema_extra = {
             "example": {
-                "customer_id": "cust-001",
+                "customer_id": "550e8400-e29b-41d4-a716-446655440000",
                 "name": "Acme Corp",
                 "email": "contact@acme.com",
                 "phone": "+1-555-123-4567",

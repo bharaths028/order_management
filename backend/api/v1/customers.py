@@ -5,6 +5,7 @@ from dependencies.database import get_db
 from crud.customer import get_customer, get_customers, create_customer, update_customer
 from schemas.customer import Customer, CustomerCreate, CustomerUpdate
 from schemas.error import Error
+import uuid
 
 router = APIRouter()
 
@@ -54,7 +55,7 @@ def list_customers(page: int = 1, limit: int = 10, db: Session = Depends(get_db)
         429: {"description": "Rate limit exceeded", "model": Error}
     }
 )
-def read_customer(customer_id: str, db: Session = Depends(get_db)):
+def read_customer(customer_id: uuid.UUID, db: Session = Depends(get_db)):
     customer = get_customer(db, customer_id)
     if customer is None:
         raise HTTPException(status_code=404, detail={"code": "err_not_found", "message": "Customer not found"})
@@ -73,7 +74,7 @@ def read_customer(customer_id: str, db: Session = Depends(get_db)):
         429: {"description": "Rate limit exceeded", "model": Error}
     }
 )
-def update_customer_details(customer_id: str, customer_update: CustomerUpdate, db: Session = Depends(get_db)):
+def update_customer_details(customer_id: uuid.UUID, customer_update: CustomerUpdate, db: Session = Depends(get_db)):
     customer = update_customer(db, customer_id, customer_update)
     if customer is None:
         raise HTTPException(status_code=404, detail={"code": "err_not_found", "message": "Customer not found"})

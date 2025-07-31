@@ -2,9 +2,10 @@ from pydantic import BaseModel, Field, validator
 from typing import List, Optional
 from datetime import datetime
 from .customer import Customer
+import uuid
 
 class EnquiryProductBase(BaseModel):
-    product_id: str = Field(..., description="Product ID", example="isp-a123")
+    product_id: uuid.UUID = Field(..., description="Product ID", example="550e8400-e29b-41d4-a716-446655440000")
     quantity: float = Field(..., description="Quantity requested", example=100.00)
     chemical_name: Optional[str] = Field(None, description="Chemical name", example="Propan-2-one")
     price: Optional[float] = Field(None, description="Price per unit", example=50.00)
@@ -18,7 +19,7 @@ class EnquiryProductBase(BaseModel):
     class Config:
         json_schema_extra = {
             "example": {
-                "product_id": "isp-a123",
+                "product_id": "550e8400-e29b-41d4-a716-446655440000",
                 "quantity": 100.00,
                 "chemical_name": "Propan-2-one",
                 "price": 50.00,
@@ -32,26 +33,24 @@ class EnquiryProductBase(BaseModel):
         }
 
 class EnquiryBase(BaseModel):
-    customer_id: str = Field(..., description="Customer ID", example="cust-001")
+    customer_id: uuid.UUID = Field(..., description="Customer ID", example="550e8400-e29b-41d4-a716-446655440000")
     status: str = Field("open", description="Enquiry status (open/processed/closed)", example="open")
     products: List[EnquiryProductBase] = Field([], description="List of products in the enquiry")
 
 class EnquiryCreate(EnquiryBase):
-    enquiry_id: str = Field(..., description="Unique enquiry ID (format ISP-MM/YY/XXXX)", example="isp02/25/0020")
     enquiry_date: str = Field(..., description="Enquiry date (dd-mm-yyyy)", example="05-07-2025")
     enquiry_time: str = Field(..., description="Enquiry time (HH:MM:SS)", example="01:11:00")
 
     class Config:
         json_schema_extra = {
             "example": {
-                "enquiry_id": "isp02/25/0020",
                 "customer_id": "cust-001",
                 "enquiry_date": "05-07-2025",
                 "enquiry_time": "01:11:00",
                 "status": "open",
                 "products": [
                     {
-                        "product_id": "isp-a123",
+                        "product_id": "550e8400-e29b-41d4-a716-446655440000",
                         "quantity": 100.00,
                         "chemical_name": "Propan-2-one",
                         "price": 50.00,
@@ -77,7 +76,7 @@ class EnquiryUpdate(BaseModel):
         }
 
 class Enquiry(EnquiryBase):
-    enquiry_id: str = Field(..., description="Unique enquiry ID", example="isp02/25/0020")
+    enquiry_id: uuid.UUID = Field(..., description="Unique enquiry ID", example="550e8400-e29b-41d4-a716-446655440000")
     enquiry_datetime: datetime = Field(..., description="Combined enquiry date and time")
     enquiry_date: Optional[str] = Field(None, description="Enquiry date (dd-mm-yyyy)", example="05-07-2025")
     enquiry_time: Optional[str] = Field(None, description="Enquiry time (HH:MM:SS)", example="01:11:00")
@@ -96,19 +95,19 @@ class Enquiry(EnquiryBase):
         from_attributes = True
         json_schema_extra = {
             "example": {
-                "enquiry_id": "isp02/25/0020",
-                "customer_id": "cust-001",
+                "enquiry_id": "550e8400-e29b-41d4-a716-446655440000",
+                "customer_id": "550e8400-e29b-41d4-a716-446655440000",
                 "enquiry_date": "05-07-2025",
                 "enquiry_time": "01:11:00",
                 "status": "open",
                 "products": [
                     {
-                        "product_id": "isp-a123",
+                        "product_id": "550e8400-e29b-41d4-a716-446655440000",
                         "quantity": 100.00,
                         "chemical_name": "Propan-2-one",
                         "price": 50.00,
                         "cas_number": "67-64-1",
-                        "cat_number": "isp-a049010",
+                        "cat_number": "550e8400-e29b-41d4-a716-446655440000",
                         "molecular_weight": 58.08,
                         "variant": "25kg Drum",
                         "flag": "y",
@@ -157,7 +156,7 @@ class ProductRequest(BaseModel):
         }
 
 class EmailRequest(BaseModel):
-    customer_id: str = Field(..., description="Customer ID", example="cust-001")
+    customer_id: uuid.UUID = Field(..., description="Customer ID", example="550e8400-e29b-41d4-a716-446655440000")
     email_content: str = Field(..., description="Email content", example="Request for Acetone, 100kg")
     products: List[ProductRequest] = Field(..., description="List of products in the email")
     attachments: List[Attachment] = Field(..., description="List of attachments")
@@ -165,7 +164,7 @@ class EmailRequest(BaseModel):
     class Config:
         json_schema_extra = {
             "example": {
-                "customer_id": "cust-001",
+                "customer_id": "550e8400-e29b-41d4-a716-446655440000",
                 "email_content": "Request for Acetone, 100kg",
                 "products": [
                     {
@@ -197,7 +196,7 @@ class BulkEnquiryRequest(BaseModel):
             "example": {
                 "emails": [
                     {
-                        "customer_id": "cust-001",
+                        "customer_id": "550e8400-e29b-41d4-a716-446655440000",
                         "email_content": "Request for Acetone, 100kg",
                         "products": [
                             {
@@ -224,37 +223,37 @@ class BulkEnquiryRequest(BaseModel):
         }
 
 class EnquiryStatus(BaseModel):
-    enquiry_id: str = Field(..., description="Enquiry ID", example="isp02/25/0020")
+    enquiry_id: uuid.UUID = Field(..., description="Enquiry ID", example="550e8400-e29b-41d4-a716-446655440000")
     status: str = Field(..., description="Enquiry status (accepted/rejected)", example="accepted")
     message: Optional[str] = Field(None, description="Status message", example="Enquiry queued for parsing")
 
     class Config:
         json_schema_extra = {
             "example": {
-                "enquiry_id": "isp02/25/0020",
+                "enquiry_id": "550e8400-e29b-41d4-a716-446655440000",
                 "status": "accepted",
                 "message": "Enquiry queued for parsing"
             }
         }
 
 class BulkEnquiryResponse(BaseModel):
-    batch_id: str = Field(..., description="Batch ID for the bulk request", example="batch-001")
+    batch_id: uuid.UUID = Field(..., description="Batch ID for the bulk request", example="550e8400-e29b-41d4-a716-446655440000")
     enquiries: List[EnquiryStatus] = Field(..., description="List of enquiry statuses")
 
     class Config:
         json_schema_extra = {
             "example": {
-                "batch_id": "batch-001",
+                "batch_id": "550e8400-e29b-41d4-a716-446655440000",
                 "enquiries": [
                     {
-                        "enquiry_id": "isp02/25/0020",
+                        "enquiry_id": "550e8400-e29b-41d4-a716-446655440000",
                         "status": "accepted",
                         "message": "Enquiry queued for parsing"
                     },
                     {
-                        "enquiry_id": "isp02/25/0021",
+                        "enquiry_id": "550e8400-e29b-41d4-a716-446655440000",
                         "status": "rejected",
-                        "message": "Duplicate enquiry detected (isp02/25/0001)"
+                        "message": "Duplicate enquiry detected (550e8400-e29b-41d4-a716-446655440000)"
                     }
                 ]
             }
@@ -268,14 +267,14 @@ class EnquiryDashboardResponse(BaseModel):
         json_schema_extra = {
             "example": {
                 "enquiry": {
-                    "enquiry_id": "isp02/25/0020",
-                    "customer_id": "cust-001",
+                    "enquiry_id": "550e8400-e29b-41d4-a716-446655440000",
+                    "customer_id": "550e8400-e29b-41d4-a716-446655440000",
                     "enquiry_date": "05-07-2025",
                     "enquiry_time": "01:11:00",
                     "status": "open",
                     "products": [
                         {
-                            "product_id": "isp-a123",
+                            "product_id": "550e8400-e29b-41d4-a716-446655440000",
                             "quantity": 100.00,
                             "chemical_name": "Propan-2-one",
                             "price": 50.00,
@@ -289,7 +288,7 @@ class EnquiryDashboardResponse(BaseModel):
                     ]
                 },
                 "customer": {
-                    "customer_id": "cust-001",
+                    "customer_id": "550e8400-e29b-41d4-a716-446655440000",
                     "name": "Acme Corp",
                     "email": "contact@acme.com",
                     "phone": "+1-555-123-4567",
