@@ -3,7 +3,7 @@ from typing import Optional
 import uuid
 
 class ProductBase(BaseModel):
-    product_name: str = Field(..., description="Name of the product", example="Acetone")
+    product_name: str = Field(None, description="Name of the product", example="Acetone")
     cat_number: str = Field(..., description="Catalog number (format ISP-{Alpha}{XXXXXX})", example="isp-a049010")
     cas_number: Optional[str] = Field(None, description="CAS number", example="67-64-1")
     chemical_name: Optional[str] = Field(None, description="Chemical name", example="Propan-2-one")

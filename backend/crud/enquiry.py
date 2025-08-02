@@ -28,10 +28,10 @@ def create_enquiry(db: Session, enquiry: EnquiryCreate, enquiry_datetime: dateti
     
     for product in enquiry.products:
         # Check if product_id is None or product doesn't exist
-        if not product.product_id or not get_product(db, product.product_id):
+        if product.product_id is None or not get_product(db, product.product_id):
             # Create a new product if not present
             product_create = ProductCreate(
-                product_id=uuid.uuid4(),  # Generate a UUID for product_id
+                product_id=uuid.uuid4(),  # Generate a new UUID
                 product_name=product.chemical_name or "Unnamed Product",
                 cat_number=product.cat_number or f"ISP-A{uuid.uuid4().hex[:6]}",
                 cas_number=product.cas_number,
@@ -43,6 +43,7 @@ def create_enquiry(db: Session, enquiry: EnquiryCreate, enquiry_datetime: dateti
             new_product = create_product(db, product_create)
             product_id = new_product.product_id
         else:
+            # Use the provided product_id if valid
             product_id = product.product_id
 
         # Create EnquiryProduct with the resolved product_id
