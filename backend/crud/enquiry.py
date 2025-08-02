@@ -3,6 +3,7 @@ from datetime import datetime
 from models.enquiry import Enquiry
 from models.enquiry_product import EnquiryProduct
 from schemas.enquiry import EnquiryCreate, EmailRequest, EnquiryUpdate
+from schemas.product import ProductCreate
 from crud.product import get_product, create_product
 from utils.enquiry_id import generate_enquiry_id
 from models.product import Product
@@ -19,7 +20,6 @@ def get_enquiries(db: Session, status: str = None, skip: int = 0, limit: int = 1
 
 def create_enquiry(db: Session, enquiry: EnquiryCreate, enquiry_datetime: datetime):
     db_enquiry = Enquiry(
-        enquiry_id=enquiry.enquiry_id,
         customer_id=enquiry.customer_id,
         enquiry_datetime=enquiry_datetime,
         status=enquiry.status

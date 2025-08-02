@@ -48,6 +48,26 @@ class EnquiryCreate(EnquiryBase):
     enquiry_date: str = Field(..., description="Enquiry date (dd-mm-yyyy)", example="05-07-2025")
     enquiry_time: str = Field(..., description="Enquiry time (HH:MM:SS)", example="01:11:00")
 
+    @validator('enquiry_date', pre=True)
+    def parse_enquiry_date(cls, v):
+        if v and '-' in v:
+            try:
+                year, month, day = map(int, v.split('-'))
+                return f"{day:02d}-{month:02d}-{year}"
+            except ValueError:
+                raise ValueError("Invalid date format. Use yyyy-mm-dd or dd-mm-yyyy")
+        return v
+
+    @validator('enquiry_time', pre=True)
+    def parse_enquiry_time(cls, v):
+        if v and ':' in v:
+            try:
+                hours, minutes = map(int, v.split(':'))
+                return f"{hours:02d}:{minutes:02d}:00"
+            except ValueError:
+                raise ValueError("Invalid time format. Use HH:MM or HH:MM:SS")
+        return v
+
     class Config:
         extra = "ignore"  # Allow omission of optional fields
         json_schema_extra = {
