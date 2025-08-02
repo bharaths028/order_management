@@ -45,7 +45,6 @@ class EnquiryBase(BaseModel):
     products: List[EnquiryProductBase] = Field(default_factory=list, description="List of products in the enquiry")
 
 class EnquiryCreate(EnquiryBase):
-    enquiry_id: uuid.UUID = Field(..., description="Unique enquiry ID", example="550e8400-e29b-41d4-a716-446655440000")
     enquiry_date: str = Field(..., description="Enquiry date (dd-mm-yyyy)", example="05-07-2025")
     enquiry_time: str = Field(..., description="Enquiry time (HH:MM:SS)", example="01:11:00")
 
