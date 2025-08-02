@@ -21,6 +21,15 @@ class EnquiryProductBase(BaseModel):
         if v == "":
             return None
         return v
+    
+    @validator('flag')
+    def validate_and_normalize_flag(cls, v):
+        if v is None:
+            return None
+        valid_flags = {"y", "n"}  # Match expected uppercase input values
+        if v.lower() not in valid_flags:
+            raise ValueError(f"Flag must be one of {valid_flags}")
+        return v.lower()  # Normalize to lowercase (y or n)
 
     class Config:
         extra = "ignore"  # Allow omission of optional fields
@@ -44,9 +53,38 @@ class EnquiryBase(BaseModel):
     status: str = Field("open", description="Enquiry status (open/processed/closed)", example="open")
     products: List[EnquiryProductBase] = Field(default_factory=list, description="List of products in the enquiry")
 
+    @validator('status')
+    def validate_status(cls, v):
+        if v is not None:
+            valid_statuses = {"open", "processed", "closed"}
+            if v.lower() not in valid_statuses:
+                raise ValueError(f"Status must be one of {valid_statuses}")
+            return v.lower()
+        return v
+
 class EnquiryCreate(EnquiryBase):
     enquiry_date: str = Field(..., description="Enquiry date (dd-mm-yyyy)", example="05-07-2025")
     enquiry_time: str = Field(..., description="Enquiry time (HH:MM:SS)", example="01:11:00")
+
+    @validator('enquiry_date', pre=True)
+    def parse_enquiry_date(cls, v):
+        if v and '-' in v:
+            try:
+                year, month, day = map(int, v.split('-'))
+                return f"{day:02d}-{month:02d}-{year}"
+            except ValueError:
+                raise ValueError("Invalid date format. Use yyyy-mm-dd or dd-mm-yyyy")
+        return v
+
+    @validator('enquiry_time', pre=True)
+    def parse_enquiry_time(cls, v):
+        if v and ':' in v:
+            try:
+                hours, minutes = map(int, v.split(':'))
+                return f"{hours:02d}:{minutes:02d}:00"
+            except ValueError:
+                raise ValueError("Invalid time format. Use HH:MM or HH:MM:SS")
+        return v
 
     class Config:
         extra = "ignore"  # Allow omission of optional fields
@@ -76,6 +114,15 @@ class EnquiryCreate(EnquiryBase):
 class EnquiryUpdate(BaseModel):
     status: Optional[str] = Field(None, description="Enquiry status (open/processed/closed)", example="processed")
 
+    @validator('status')
+    def validate_status(cls, v):
+        if v is not None:
+            valid_statuses = {"open", "processed", "closed"}
+            if v.lower() not in valid_statuses:
+                raise ValueError(f"Status must be one of {valid_statuses}")
+            return v.lower()
+        return v
+
     class Config:
         extra = "ignore"
         json_schema_extra = {
@@ -89,6 +136,8 @@ class Enquiry(EnquiryBase):
     enquiry_datetime: datetime = Field(..., description="Combined enquiry date and time")
     enquiry_date: Optional[str] = Field(None, description="Enquiry date (dd-mm-yyyy)", example="05-07-2025")
     enquiry_time: Optional[str] = Field(None, description="Enquiry time (HH:MM:SS)", example="01:11:00")
+    customer_name: Optional[str] = Field(None, description="Name of the customer", example="John Doe")
+    email: Optional[str] = Field(None, description="Customer email", example="john.doe@example.com")
 
     @validator('enquiry_date', 'enquiry_time', pre=True, always=True)
     def compute_date_time(cls, v, values):
@@ -107,6 +156,7 @@ class Enquiry(EnquiryBase):
             "example": {
                 "enquiry_id": "550e8400-e29b-41d4-a716-446655440000",
                 "customer_id": "e000fa1f-c5d2-4250-af65-1ee6cfa041b7",
+                "customer_name": "John Doe",
                 "enquiry_date": "05-07-2025",
                 "enquiry_time": "01:11:00",
                 "status": "open",

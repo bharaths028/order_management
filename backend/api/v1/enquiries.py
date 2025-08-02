@@ -113,7 +113,7 @@ def process_bulk_enquiries(request: BulkEnquiryRequest, db: Session = Depends(ge
     batch_id = f"batch-{uuid.uuid4().hex[:8]}"
     results = []
     for email in request.emails:
-        enquiry_id = generate_enquiry_id()
+        enquiry_id = uuid.uuid4()
         hash_value = compute_enquiry_hash(email)
         existing_hash = get_enquiry_hash(db, hash_value)
         if existing_hash:
