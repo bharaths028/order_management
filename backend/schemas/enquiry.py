@@ -1,11 +1,11 @@
 from pydantic import BaseModel, Field, validator
 from typing import List, Optional
 from datetime import datetime
-from .customer import Customer
 import uuid
+from .customer import Customer
 
 class EnquiryProductBase(BaseModel):
-    product_id: Optional[uuid.UUID] = Field(..., description="Product ID (generated if not provided)", example="550e8400-e29b-41d4-a716-446655440000")
+    product_id: Optional[uuid.UUID] = Field(default=None, description="Product ID (generated if not provided or empty)", example="550e8400-e29b-41d4-a716-446655440001")
     quantity: float = Field(..., description="Quantity requested", example=100.00)
     chemical_name: Optional[str] = Field(None, description="Chemical name", example="Propan-2-one")
     price: Optional[float] = Field(None, description="Price per unit", example=50.00)
@@ -16,10 +16,17 @@ class EnquiryProductBase(BaseModel):
     flag: Optional[str] = Field(None, description="Flag (y/n) for known/unknown product", example="y")
     attachment_ref: Optional[str] = Field(None, description="Attachment reference", example="s3://ordermanagement-attachments/enquiries/isp02-25-0020/isp-a123-formula.png")
 
+    @validator('product_id', pre=True)
+    def handle_empty_product_id(cls, v):
+        if v == "":
+            return None
+        return v
+
     class Config:
+        extra = "ignore"  # Allow omission of optional fields
         json_schema_extra = {
             "example": {
-                "product_id": "550e8400-e29b-41d4-a716-446655440000",
+                "product_id": "550e8400-e29b-41d4-a716-446655440001",
                 "quantity": 100.00,
                 "chemical_name": "Propan-2-one",
                 "price": 50.00,
@@ -33,27 +40,29 @@ class EnquiryProductBase(BaseModel):
         }
 
 class EnquiryBase(BaseModel):
-    customer_id: uuid.UUID = Field(..., description="Customer ID", example="550e8400-e29b-41d4-a716-446655440000")
+    customer_id: uuid.UUID = Field(..., description="Customer ID", example="e000fa1f-c5d2-4250-af65-1ee6cfa041b7")
     status: str = Field("open", description="Enquiry status (open/processed/closed)", example="open")
-    products: List[EnquiryProductBase] = Field([], description="List of products in the enquiry")
+    products: List[EnquiryProductBase] = Field(default_factory=list, description="List of products in the enquiry")
 
 class EnquiryCreate(EnquiryBase):
+    enquiry_id: uuid.UUID = Field(..., description="Unique enquiry ID", example="550e8400-e29b-41d4-a716-446655440000")
     enquiry_date: str = Field(..., description="Enquiry date (dd-mm-yyyy)", example="05-07-2025")
     enquiry_time: str = Field(..., description="Enquiry time (HH:MM:SS)", example="01:11:00")
 
     class Config:
+        extra = "ignore"  # Allow omission of optional fields
         json_schema_extra = {
             "example": {
-                "customer_id": "cust-001",
+                "enquiry_id": "550e8400-e29b-41d4-a716-446655440000",
+                "customer_id": "e000fa1f-c5d2-4250-af65-1ee6cfa041b7",
                 "enquiry_date": "05-07-2025",
                 "enquiry_time": "01:11:00",
                 "status": "open",
                 "products": [
                     {
-                        "product_id": "550e8400-e29b-41d4-a716-446655440000",
-                        "quantity": 100.00,
+                        "quantity": 100,  # Omitted product_id
                         "chemical_name": "Propan-2-one",
-                        "price": 50.00,
+                        "price": 50,
                         "cas_number": "67-64-1",
                         "cat_number": "isp-a049010",
                         "molecular_weight": 58.08,
@@ -69,6 +78,7 @@ class EnquiryUpdate(BaseModel):
     status: Optional[str] = Field(None, description="Enquiry status (open/processed/closed)", example="processed")
 
     class Config:
+        extra = "ignore"
         json_schema_extra = {
             "example": {
                 "status": "processed"
@@ -93,21 +103,22 @@ class Enquiry(EnquiryBase):
 
     class Config:
         from_attributes = True
+        extra = "ignore"
         json_schema_extra = {
             "example": {
                 "enquiry_id": "550e8400-e29b-41d4-a716-446655440000",
-                "customer_id": "550e8400-e29b-41d4-a716-446655440000",
+                "customer_id": "e000fa1f-c5d2-4250-af65-1ee6cfa041b7",
                 "enquiry_date": "05-07-2025",
                 "enquiry_time": "01:11:00",
                 "status": "open",
                 "products": [
                     {
-                        "product_id": "550e8400-e29b-41d4-a716-446655440000",
-                        "quantity": 100.00,
+                        "product_id": "550e8400-e29b-41d4-a716-446655440001",
+                        "quantity": 100,
                         "chemical_name": "Propan-2-one",
-                        "price": 50.00,
+                        "price": 50,
                         "cas_number": "67-64-1",
-                        "cat_number": "550e8400-e29b-41d4-a716-446655440000",
+                        "cat_number": "isp-a049010",
                         "molecular_weight": 58.08,
                         "variant": "25kg Drum",
                         "flag": "y",
