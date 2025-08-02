@@ -5,7 +5,7 @@ from .customer import Customer
 import uuid
 
 class EnquiryProductBase(BaseModel):
-    product_id: uuid.UUID = Field(..., description="Product ID", example="550e8400-e29b-41d4-a716-446655440000")
+    product_id: Optional[uuid.UUID] = Field(..., description="Product ID (generated if not provided)", example="550e8400-e29b-41d4-a716-446655440000")
     quantity: float = Field(..., description="Quantity requested", example=100.00)
     chemical_name: Optional[str] = Field(None, description="Chemical name", example="Propan-2-one")
     price: Optional[float] = Field(None, description="Price per unit", example=50.00)
