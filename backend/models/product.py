@@ -5,6 +5,7 @@ from dependencies.database import Base
 
 tag_enum = ENUM('vendor', 'web', 'internal', name='tag_enum', create_type=True)
 approval_status_enum = ENUM('pending', 'approved', 'rejected', name='approval_status_enum', create_type=True)
+standards_enum = ENUM('USA', 'UK', name='standards_enum', create_type=True)
 
 class Product(Base):
     __tablename__ = "products"
@@ -27,3 +28,5 @@ class Product(Base):
     ambient = Column(String(50))
     technical_data = Column(Text)
     country_of_origin = Column(String(50), default='india')
+    variant = Column(String(50))
+    standards = Column(standards_enum, nullable=False, default='USA')

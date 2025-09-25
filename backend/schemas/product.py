@@ -3,7 +3,7 @@ from typing import Optional
 import uuid
 
 class ProductBase(BaseModel):
-    product_name: str = Field(None, description="Name of the product", example="Acetone")
+    product_name: str = Field(..., description="Name of the product", example="Acetone")
     cat_number: str = Field(..., description="Catalog number (format ISP-{Alpha}{XXXXXX})", example="isp-a049010")
     cas_number: Optional[str] = Field(None, description="CAS number", example="67-64-1")
     chemical_name: Optional[str] = Field(None, description="Chemical name", example="Propan-2-one")
@@ -21,6 +21,8 @@ class ProductBase(BaseModel):
     ambient: Optional[str] = Field(None, description="Ambient conditions", example="Stable")
     technical_data: Optional[str] = Field(None, description="Technical data", example="95.5%")
     country_of_origin: Optional[str] = Field("india", description="Country of origin", example="india")
+    variant: Optional[str] = Field(None, description="Product variant", example="High Purity")
+    standards: str = Field("USA", description="Standards (USA/UK)", example="USA")
 
 class ProductCreate(ProductBase):
 
@@ -44,7 +46,9 @@ class ProductCreate(ProductBase):
                 "shipping_temperature": "Room Temperature",
                 "ambient": "Stable",
                 "technical_data": "95.5%",
-                "country_of_origin": "india"
+                "country_of_origin": "india",
+                "variant": "High Purity",
+                "standards": "USA"
             }
         }
 
@@ -73,7 +77,9 @@ class Product(ProductBase):
                 "shipping_temperature": "Room Temperature",
                 "ambient": "Stable",
                 "technical_data": "95.5%",
-                "country_of_origin": "india"
+                "country_of_origin": "india",
+                "variant": "High Purity",
+                "standards": "USA"
             }
         }
 
