@@ -15,10 +15,6 @@ app = FastAPI(
         {"name": "enquiries", "description": "Operations related to enquiry management and bulk processing"},
         {"name": "changelog", "description": "Operations related to retrieving change logs"},
         {"name": "health", "description": "System health check operations"}
-    ],
-    servers=[
-        {"url": os.getenv("RENDER_EXTERNAL_URL", "https://order-management-api-knhi.onrender.com"), "description": "Production Server"},
-        {"url": "http://localhost:8000", "description": "Local server"}
     ]
 )
 

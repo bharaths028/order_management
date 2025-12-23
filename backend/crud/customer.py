@@ -9,6 +9,9 @@ def get_customer(db: Session, customer_id: uuid.UUID):
 def get_customers(db: Session, skip: int = 0, limit: int = 10):
     return db.query(Customer).offset(skip).limit(limit).all()
 
+def get_customer_by_email(db: Session, email: str):
+    return db.query(Customer).filter(Customer.email == email).first()
+
 def create_customer(db: Session, customer: CustomerCreate):
     db_customer = Customer(**customer.dict())
     db.add(db_customer)
