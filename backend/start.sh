@@ -16,13 +16,20 @@ PID_DIR="${PID_DIR:-$AIRFLOW_HOME/pids}"
 mkdir -p "$LOG_DIR" "$PID_DIR"
 
 # Database configuration
-if [ "$ENVIRONMENT" = "production" ]; then
-    # Production: Use AWS Aurora PostgreSQL
-    export DATABASE_URL="${AWS_DATABASE_URL:-postgresql://admin:password@order-management.c7jxyz.us-east-1.rds.amazonaws.com:5432/order_management}"
-else
-    # Development: Use local Docker PostgreSQL
-    export DATABASE_URL="${DATABASE_URL:-postgresql://admin:admin123@postgres:5432/order_management}"
+# Use the DATABASE_URL passed via environment variables (docker-compose)
+# For development: Use local Docker PostgreSQL
+# For production: Pass AWS Aurora URL via DATABASE_URL env variable
+if [ -z "$DATABASE_URL" ]; then
+    if [ "$ENVIRONMENT" = "production" ]; then
+        echo "ERROR: DATABASE_URL must be set for production deployment (AWS Aurora)" >&2
+        exit 1
+    else
+        # Development: Use local Docker PostgreSQL
+        DATABASE_URL="postgresql://admin:admin123@postgres:5432/order_management"
+    fi
 fi
+
+export DATABASE_URL
 
 echo "Starting Order Management System..."
 echo "Environment: ${ENVIRONMENT:-development}"
@@ -92,15 +99,32 @@ cleanup() {
 trap cleanup EXIT SIGTERM SIGINT
 
 # Start FastAPI application with Uvicorn as the main foreground process
-echo "Starting FastAPI application..."
-echo "FastAPI is now running. Visit http://localhost:8000/docs for API documentation"
-echo ""
+echo "=== Starting Order Management System ===" >&2
+echo "Starting FastAPI application..." >&2
+echo "FastAPI is now running. Visit http://localhost:8000/docs for API documentation" >&2
+echo "" >&2
 
 # Export environment variables for FastAPI app
-export PYTHONPATH="$PYTHONPATH"
-export DATABASE_URL="$DATABASE_URL"
+export PYTHONPATH="${PYTHONPATH}"
+export DATABASE_URL="${DATABASE_URL}"
+
+# Change to backend directory where main.py is located
+echo "Current directory: $(pwd)" >&2
+echo "DATABASE_URL: ${DATABASE_URL}" >&2
+
+if [ -d "/opt/airflow/backend" ]; then
+    echo "Backend directory exists" >&2
+    cd "/opt/airflow/backend" || (echo "Failed to cd to backend" >&2; exit 1)
+    echo "Changed to: $(pwd)" >&2
+else
+    echo "ERROR: Backend directory does not exist!" >&2
+    exit 1
+fi
+
+echo "About to run Uvicorn..." >&2
 
 # Run FastAPI with Uvicorn in foreground (this will be the main process)
+# Using full path to main.py for clarity
 uvicorn main:app \
     --host 0.0.0.0 \
     --port 8000 \

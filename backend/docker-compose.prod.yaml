@@ -29,27 +29,33 @@ services:
 
   # FastAPI Application with embedded Airflow
   fastapi-app:
-    build:
-      context: .
-      dockerfile: Dockerfile.prod
+    image: order-management:prod
     container_name: order-management-api
     environment:
-      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - ENVIRONMENT=${ENVIRONMENT}
       - DATABASE_URL=${DATABASE_URL}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - AWS_REGION=${AWS_REGION:-ap-south-1}
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=${DATABASE_URL}
-      - AIRFLOW__CORE__FERNET_KEY=rGTaoR2tUFcZMDRtEDO-DGgp6e4vuILUwpoDFQIEQxQ=
+      - AIRFLOW__CORE__FERNET_KEY=${AIRFLOW__CORE__FERNET_KEY}
       - AIRFLOW__CORE__LOAD_EXAMPLES=False
       - AIRFLOW__CORE__DAGS_FOLDER=/opt/airflow/dags
       - AIRFLOW__CORE__PLUGINS_FOLDER=/opt/airflow/plugins
-      - AIRFLOW__WEBSERVER__SECRET_KEY=a6b4104ecd5559064f5d8bb295f1b2cd
+      - AIRFLOW__WEBSERVER__SECRET_KEY=${AIRFLOW__WEBSERVER__SECRET_KEY}
       - AIRFLOW__LOGGING__LOGGING_LEVEL=INFO
       - PYTHONPATH=/opt/airflow/backend
     volumes:
       - ./dags:/opt/airflow/dags
-      - ./backend:/opt/airflow/backend
+      - ./api:/opt/airflow/backend/api
+      - ./crud:/opt/airflow/backend/crud
+      - ./dependencies:/opt/airflow/backend/dependencies
+      - ./models:/opt/airflow/backend/models
+      - ./schemas:/opt/airflow/backend/schemas
+      - ./scripts:/opt/airflow/backend/scripts
+      - ./utils:/opt/airflow/backend/utils
+      - ./config.py:/opt/airflow/backend/config.py
+      - ./main.py:/opt/airflow/backend/main.py
       - ./sensors:/opt/airflow/sensors
       - airflow_logs:/opt/airflow/logs
     ports:
@@ -64,11 +70,12 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 40s
+      retries: 5
+      start_period: 120s
     restart: unless-stopped
-    # Use dev profile for development with local Postgres
+    # Use both dev and prod profiles for flexibility
     profiles:
+      - dev
       - prod
 
 volumes:
